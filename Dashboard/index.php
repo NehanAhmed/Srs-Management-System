@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (isset($_SESSION['loggedin']) !=true ) {
+	header("Location: ../Auth/login.php");
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,9 +20,10 @@
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
-
-	<link rel="canonical" href="https://demo-basic.adminkit.io/" />
-
+	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.css" />
+  
+<script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+  
 	<title>AdminKit Demo - Bootstrap 5 Admin Template</title>
 
 	<link href="./css/app.css" rel="stylesheet">
@@ -52,8 +62,8 @@
 
 					include "./include/add-product.php";
 
-				}elseif(isset($_GET['add-products'])){
-					include "./include/add-product.php";
+				}elseif(isset($_GET['test-products'])){
+					include "./include/test-product.php";
 					
 				}elseif(isset($_GET['test-product'])){
 					include "./include/test-product.php";
@@ -65,6 +75,9 @@
 					include "./include/charts.php";
 				}elseif(isset($_GET['report'])){
 					include "./include/report.php";
+				}
+				elseif(isset($_GET['tester-form'])){
+					include "./include/tester-form.php";
 				}else{ 
 					include "./include/dashboard.php";
 					
@@ -77,7 +90,27 @@
 		</div>
 	</div>
 	<script src="js/app.js"></script>
-
+	
+	<script>
+	function toggleClass() {
+		let sidebarItems = document.querySelectorAll('.sidebar-item');
+		let currentPath = window.location.search;
+		
+		sidebarItems.forEach(item => {
+			// Restore active state on page load
+			if (item.getAttribute('href') && currentPath.includes(item.getAttribute('href'))) {
+				sidebarItems.forEach(i => i.classList.remove('active'));
+				item.classList.add('active');
+			}
+			
+			item.addEventListener('click', function() {
+				sidebarItems.forEach(i => i.classList.remove('active'));
+				this.classList.add('active');
+			});
+		});
+	}
+	toggleClass();
+	</script>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");

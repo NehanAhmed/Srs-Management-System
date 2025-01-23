@@ -2,19 +2,20 @@
 include __DIR__ . "/../../Partials/db.php";
 
 
+function generateProductId() {
+    return mt_rand(1000000000, 9999999999);
+}
+
 if (isset($_POST['add-product'])) {
-    if (!empty($_POST['p-code']) && !empty($_POST['r-num']) && !empty($_POST['m-num']) && !empty($_POST['p-type'])) {
+    if (!empty($_POST['p-code']) && !empty($_POST['r-num']) && !empty($_POST['m-num']) && !empty($_POST['p-type']) && !empty($_POST['p-name'])) {
         $p_code = mysqli_real_escape_string($connect, $_POST['p-code']);
         $r_num = mysqli_real_escape_string($connect, $_POST['r-num']);
         $m_num = mysqli_real_escape_string($connect, $_POST['m-num']);
         $p_type = mysqli_real_escape_string($connect, $_POST['p-type']);
-
-function generateProductId() {
-    return mt_rand(1000000000, 9999999999);
-}
+        $p_name = mysqli_real_escape_string($connect, $_POST['p-name']);
 $product_id = generateProductId();
 
-$sql = "INSERT INTO `products`(`product_id`,`product_code`, `revision_number`, `manufacturing_number`, `product_type`) VALUES ('$product_id','$p_code', '$r_num', '$m_num', '$p_type')";
+$sql = "INSERT INTO `products`(`product_id`,`product_code`, `revision_number`, `manufacturing_number`, `product_type`,`product-name`) VALUES ('$product_id','$p_code', '$r_num', '$m_num', '$p_type','$p_name')";
 
 $res = mysqli_query($connect,$sql);
     if ($res) {
@@ -30,10 +31,14 @@ $res = mysqli_query($connect,$sql);
 
 
 ?>
+<h1 style="margin-bottom:40px; text-align:center; font-weight:bold;">Add New Product to Test</h1>
 <form action="" method="post">
 <div class="col-12 col-lg-12">
     <div class="card">
-        
+    <div class="card-body">
+            <h5 class="card-title mb-2">Product Name</h5>
+            <input type="text" class="form-control" name="p-name" placeholder="E.g: Electrical Circuit" required>
+        </div>
         <div class="card-body">
             <h5 class="card-title mb-2">Product Code</h5>
             <input type="text" class="form-control" name="p-code" placeholder="E.g: 1234556">
