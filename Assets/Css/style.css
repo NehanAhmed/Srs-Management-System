@@ -1,0 +1,57 @@
+@font-face {
+    font-family: Poppins;
+    src: url(../Fonts/Poppins/Poppins-Medium.ttf);
+  }
+
+*{
+font-family: 'Poppins',sans-serif;
+
+}
+body {
+    background-color: #212529;
+    color: white;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+.hero {
+    min-height: 80vh;
+}
+
+.hero img {
+    max-width: 100%;
+    height: auto;
+}
+
+.feature-card img {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+button {
+    border: 1px solid white;
+    background-color: transparent;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: white;
+    color: black;
+}
+footer a:hover {
+text-decoration: underline;
+color: lightgray;
+}
+
+footer h6 {
+margin-bottom: 1rem;
+}
+
+footer ul li {
+margin-bottom: 0.5rem;
+}
+
+footer hr {
+border-color: rgba(255, 255, 255, 0.2);
+}

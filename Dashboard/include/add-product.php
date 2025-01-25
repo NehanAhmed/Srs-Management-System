@@ -1,70 +1,96 @@
 <?php
-include __DIR__ . "/../../Partials/db.php";
+// Include the database connection file
+include "../../Partials/db.php";
+session_start(); // Start session for CSRF protection
 
-
-function generateProductId() {
-    return mt_rand(1000000000, 9999999999);
+// Generate CSRF token if not already created
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if (isset($_POST['add-product'])) {
-    if (!empty($_POST['p-code']) && !empty($_POST['r-num']) && !empty($_POST['m-num']) && !empty($_POST['p-type']) && !empty($_POST['p-name'])) {
-        $p_code = mysqli_real_escape_string($connect, $_POST['p-code']);
-        $r_num = mysqli_real_escape_string($connect, $_POST['r-num']);
-        $m_num = mysqli_real_escape_string($connect, $_POST['m-num']);
-        $p_type = mysqli_real_escape_string($connect, $_POST['p-type']);
-        $p_name = mysqli_real_escape_string($connect, $_POST['p-name']);
-$product_id = generateProductId();
+// Function to generate a unique Product ID
+function generateProductId($connect) {
+    do {
+        $product_id = mt_rand(1000000000, 9999999999);
+        $query = "SELECT * FROM `products` WHERE `ProductID` = '$product_id'";
+        $result = mysqli_query($connect, $query);
+    } while (mysqli_num_rows($result) > 0);
+    return $product_id;
+}
 
-$sql = "INSERT INTO `products`(`product_id`,`product_code`, `revision_number`, `manufacturing_number`, `product_type`,`product-name`) VALUES ('$product_id','$p_code', '$r_num', '$m_num', '$p_type','$p_name')";
-
-$res = mysqli_query($connect,$sql);
-    if ($res) {
-        
-        echo "<script>alert('Product Added Successfully')</script>";
-    }else{
-        echo "<script>alert('Product Added Failure')</script>";
-
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-product'])) {
+    // CSRF Token validation
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Invalid CSRF token");
     }
 
-}
-}
+    // Validate required fields
+    if (!empty($_POST['p-name']) && !empty($_POST['p-type']) && !empty($_POST['m-date']) && !empty($_POST['r-num'])) {
+        // Sanitize inputs
+        $p_name = htmlspecialchars($_POST['p-name']);
+        $p_type = htmlspecialchars($_POST['p-type']);
+        $m_date = htmlspecialchars($_POST['m-date']);
+        $r_num = htmlspecialchars($_POST['r-num']);
+        $product_id = generateProductId($connect);
 
+        // Use prepared statements to insert data securely
+        $sql = "INSERT INTO `products`(`ProductID`, `ProductName`, `ProductType`, `ManufacturingDate`, `RevisionNumber`,`Status`) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $connect->prepare($sql);
+        $stmt->bind_param("isssss", $product_id, $p_name, $p_type, $m_date, $r_num, $status);
+        $status = '';
+        $res = $stmt->execute();
 
+        if ($res) {
+            echo "<script>alert('Product Added Successfully'); window.location.href = '../index.php';</script>";
+        } else {
+            echo "<script>alert('Failed to add product. Please try again.');</script>";
+        }
+    } else {
+        echo "<script>alert('Please fill out all fields.');</script>";
+    }
+}
 ?>
-<h1 style="margin-bottom:40px; text-align:center; font-weight:bold;">Add New Product to Test</h1>
-<form action="" method="post">
-<div class="col-12 col-lg-12">
-    <div class="card">
-    <div class="card-body">
-            <h5 class="card-title mb-2">Product Name</h5>
-            <input type="text" class="form-control" name="p-name" placeholder="E.g: Electrical Circuit" required>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title mb-2">Product Code</h5>
-            <input type="text" class="form-control" name="p-code" placeholder="E.g: 1234556">
-        </div>
-        <div class="card-body">
-            <h5 class="card-title mb-2">Revision Number</h5>
-            <input type="text" class="form-control" name="r-num" placeholder="E.g:3234">
-        </div>
-        <div class="card-body">
-            <h5 class="card-title mb-2">Manufacturing Number</h5>
-            <input type="text" class="form-control" name="m-num" placeholder="E.g: 1344342">
-        </div>
-        <div class="card-body">
-            <h5 class="card-title mb-2">Product Type</h5>
-            <select class="select" name="p-type" required>
-                <option value="">Select</option>
-                <option value="1">Type 1</option>
-                <option value="2">Type 2</option>
-                <option value="3">Type 3</option>
-            </select>
-        </div>
-            <div class="card-body">
-                <input class="btn btn-primary"  type="submit" value="add-product" name="add-product">
-                
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-bottom:40px; text-align:center; font-weight:bold;">Add New Product to Test</h1>
+        <form action="" method="post">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <div class="col-12 col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Product Name</h5>
+                        <input type="text" class="form-control" name="p-name" placeholder="E.g: Electrical Circuit" required>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Product Type</h5>
+                        <input type="text" class="form-control" name="p-type" placeholder="E.g: Circuit" required>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Manufacturing Date</h5>
+                        <input type="date" class="form-control" name="m-date" required>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Revision Number</h5>
+                        <input type="text" class="form-control" name="r-num" placeholder="E.g: 1" required>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" name="add-product">Add</button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
-    </form>
-    
+
+    <?php include "../../Partials/footer.php"; ?>
+</body>
+</html>

@@ -21,13 +21,14 @@ if (isset($_SESSION['loggedin']) !=true ) {
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
 	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.css" />
-  
+	<script src="https://kit.fontawesome.com/0a02fbb60a.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
   
 	<title>AdminKit Demo - Bootstrap 5 Admin Template</title>
 
 	<link href="./css/app.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 	<style>
 		select{
 			width: 20%;
@@ -46,7 +47,18 @@ if (isset($_SESSION['loggedin']) !=true ) {
 <body>
 	
 <div class="wrapper">
-	<?php include "../Partials/sidebar.php"?>		
+	<?php if (isset($_SESSION['RoleID'])) {
+		if ($_SESSION['RoleID'] == 2){
+			include "../Partials/testing-department.php";
+		}elseif($_SESSION['RoleID'] == 3){
+			include "../Partials/cpri-admin.php";
+		}else{
+			include "../Partials/sidebar-admin.php";
+			
+		}
+	}
+		
+		?>
 
 		<div class="main">
 			<?php include "../Partials/header.php"?>
@@ -54,31 +66,46 @@ if (isset($_SESSION['loggedin']) !=true ) {
 			<main class="content">
 
 				<?php
+				//Include for All sidebar
 				 if (isset($_GET['dashboard']) ) {
 					include "./include/dashboard.php";
 				}elseif(isset($_GET['profile'])){
 					include "./include/profile.php";
-				}elseif(isset($_GET['add-products'])){
+				}
 
+				//Include for CPRI Sidebar
+				elseif(isset($_GET['products'])){
+					include "./include/products.php";
+				}elseif(isset($_GET['launch-product'])){
+					include "./include/launch.php";
+				}elseif(isset($_GET['catalog'])){
+					include "./include/catalog.php";
+				}
+				//Include for Tester Department Sidebar
+				
+				elseif(isset($_GET['test-product'])){
+					include "./include/test-product.php";	
+				}elseif(isset($_GET['retesting'])){
+					include "./include/retesting.php";
+				}elseif(isset($_GET['tester-form'])){
+					include "./include/tester-form.php";
+				}elseif(isset($_GET['testing-form'])){
+					include "./include/testing-form.php";
+				}elseif(isset($_GET['tester-detail'])){
+					include "./include/tester-detail.php";
+				}
+				//Include for Admin Sidebar
+				elseif(isset($_GET['all-products'])){
+					include "./include/all-product.php";
+				}elseif(isset($_GET['add-product'])){
 					include "./include/add-product.php";
-
-				}elseif(isset($_GET['test-products'])){
-					include "./include/test-product.php";
-					
-				}elseif(isset($_GET['test-product'])){
-					include "./include/test-product.php";
-				}elseif(isset($_GET['cpri'])){
-					include "./include/cpri.php";
 				}elseif(isset($_GET['marketplace'])){
 					include "./include/marketplace.php";
-				}elseif(isset($_GET['charts'])){
-					include "./include/charts.php";
-				}elseif(isset($_GET['report'])){
-					include "./include/report.php";
+				}elseif(isset($_GET['workflow'])){
+					include "./include/workflow.php";
 				}
-				elseif(isset($_GET['tester-form'])){
-					include "./include/tester-form.php";
-				}else{ 
+
+				else{ 
 					include "./include/dashboard.php";
 					
 				}
@@ -111,6 +138,8 @@ if (isset($_SESSION['loggedin']) !=true ) {
 	}
 	toggleClass();
 	</script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css
+"></script>
 	<script>
 		document.addEventListener("DOMContentLoaded", function() {
 			var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");

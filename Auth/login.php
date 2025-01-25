@@ -1,125 +1,106 @@
 <?php
-    include "../Partials/db.php";
+session_start(); // Make sure session is started
 
-$sql = "SELECT * FROM `departments`";
-
-$dropdown_res = mysqli_query($connect,$sql);
-session_start();
+include "../Partials/db.php";
 
 if (isset($_POST['login'])) {
-    $username = trim($_POST['username']);
-    $dep_id = trim($_POST['dep-id']);
-    $emp_id = trim($_POST['emp-id']);
+    $email =  $_POST['email'];
+    $password = $_POST['pass'];
 
-    $query = "SELECT * FROM `user` WHERE emp_id =$emp_id AND dep_id=$dep_id";
-    
-    $res = mysqli_query($connect,$query);
+    // Prepared statement to prevent SQL injection
+    $sql = "SELECT * FROM `users` WHERE Email = ?";
+    $stmt = mysqli_prepare($connect, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email); // "s" means the parameter is a string
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
     if (mysqli_num_rows($res) > 0) {
         $row = mysqli_fetch_assoc($res);
-        
-     
-        $_SESSION['loggedin'] = true;
-        $_SESSION['name'] = $row['name'];
-        $_SESSION['emp_id'] = $row['emp_id'];
-        $_SESSION['dep_id'] = $row['dep_id'];
-        $_SESSION['dep'] = $row['department'];
-        
-        echo "<script>alert('login successful');window.location.href='../Dashboard/'</script>";
+        if (password_verify($password, $row['PasswordHash'])) {
+            $_SESSION['loggedin'] = true;
+            $_SESSION['name'] = $row['UserName'];
+            $_SESSION['profileImg'] = $row['profileImg'];
+            $_SESSION['Email'] = $row['Email'];
+            $_SESSION['RoleID'] = $row['RoleID'];
+            echo "<script>
+                
+                window.location.href = '../Dashboard/index.php';
+              
+            </script>";
+            
+        } else {
+            echo "<script>alert('Invalid Password');</script>";
+        }
     } else {
         echo "<script>alert('No Result Found');</script>";
     }
-        
-        
-    }
-  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    mysqli_stmt_close($stmt);
+}
 ?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Srs Management System</title>
-    <script src="https://kit.fontawesome.com/0a02fbb60a.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./login.css">
-    <link rel="stylesheet" href="../Dashboard/css/app.css">
-</head>
-<body class="auth-body">
-    <div class="auth-container">
-        <div class="auth-left">
-            <img src="../Assets/Images/undraw_engineering-team_13ax.png" style="object-fit: contain;" alt="Background" class="auth-bg">
-            <div class="overlay"></div>
-            <div class="welcome-text">
-                <h1>Srs Management System</h1>
-                <p>Power up your operations with SRS Electrical Management System.</p>
-            </div>
-        </div>
-        <div class="auth-right">
-            <div class="auth-form-container">
-<h1 style="text-align:center; font-size:60px; color:#222e3c">Admin </h1>
-            <h3 style="text-align: center;">Access the Admin Panel</h3>
-                <form class="auth-form" action="" method="POST">
-                    <div class="input-group">
-                        <span class="fa fa-user input-icon"></span>
-                        <input type="text" name="username" placeholder="Username" required>
-                    </div>
-                    <div class="input-group">
-                        <span class="fa fa-id-badge input-icon"></span>
-                        <input type="number" name="dep-id" placeholder="Department Id" required>
-                    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                    <div class="input-group">
-                        <span class="fa fa-id-card input-icon"></span>
-                        <input type="number" name="emp-id" placeholder="Employee Id" required>
+        <!-- ===== CSS ===== -->
+        <link rel="stylesheet" href="../Assets/Css/login.css">
+
+        <!-- ===== BOX ICONS ===== -->
+        <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+
+        <title>Login form responsive</title>  
+    </head>
+    <body>
+        <div class="l-form">
+            <div class="shape1"></div>
+            <div class="shape2"></div>
+
+            <div class="form">
+                <img src="../Assets/Images/authentication.svg" alt="" class="form__img">
+
+                <form action="" method="POST" class="form__content">
+                    <h1 class="form__title">Welcome</h1>
+
+                    <div class="form__div form__div-one">
+                        <div class="form__icon">
+                            <i class='bx bx-user-circle'></i>
+                        </div>
+
+                        <div class="form__div-input">
+                            <label for="" class="form__label">Email</label>
+                            <input type="email" class="form__input" name="email" required>
+                        </div>
                     </div>
 
-                    <div class="input-group">
-                        
-                        <select name="select" class="select-inp" id="select" style="width: 100%;
-    padding: 1rem 2.5rem;
-    border: 1.5px solid #e5e5e5;
-    border-radius: 25px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #f9f9f9;" required>
-        <option value="select">Select Your Department</option>
-                        <?php if(mysqli_num_rows($dropdown_res) >0  ):   ?>
+                    <div class="form__div">
+                        <div class="form__icon">
+                            <i class='bx bx-lock' ></i>
+                        </div>
 
-<?php  
-while($row=  mysqli_fetch_assoc($dropdown_res) ): ?>
-
-
-    <option value="<?php echo $row['department_id']; ?>" style="padding: 1rem 2.5rem;
-    border: 1.5px solid #e5e5e5;
-    border-radius: 25px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #f9f9f9;"> <?php echo $row['department_name']; ?> </option>
-<?php  endwhile; ?>
-<?php  endif;?>
-                        </select>
+                        <div class="form__div-input">
+                            <label for="" class="form__label">Password</label>
+                            <input type="password" class="form__input" name="pass" required>
+                        </div>
                     </div>
-                   <button type="submit" name="login" value="login" class="auth-btn" value="Submit">Login</button>
-                    
+                    <input type="submit" class="form__button" value="Login" name="login">
+
+                   <div class="create-acc">
+                    <p>Don't have an account? <a href="register.php">Create one</a></p>
+                   </div>
                 </form>
-               
             </div>
+
         </div>
-    </div>
-</body>
+        
+        <!-- ===== MAIN JS ===== -->
+        <script src="../Assets/JS/login.js"></script>
+    </body>
 </html>

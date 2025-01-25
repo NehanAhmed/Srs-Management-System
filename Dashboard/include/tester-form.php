@@ -2,18 +2,22 @@
 include __DIR__ . "/../../Partials/db.php";
 
 if (isset($_POST['add-tester'])) {
-
+    if (isset($_GET['id'])) {
+        $id = $_GET['id'];
+    }
+    $productId = $_GET['id'];  // Get the product id from the form data
 $tester_name = $_POST['t-name'];
 $tester_email = $_POST['email'];
-$tester_number = $_POST['phone-num'];
+
      
 
-$sql = "INSERT INTO `testers`(`name`, `email`, `phone_number`) VALUES ('$tester_name','$tester_email','$tester_number')";
+$sql = "INSERT INTO `testers`(`product_id`, `tester_name`, `tester_email`) VALUES ('$productId','$tester_name','$tester_email')";
 
 $res = mysqli_query($connect,$sql);
     if ($res) {
+       
+        echo "<script>window.location.href = 'index.php?testing-form&id=" . $id . "&tester_id=" . mysqli_insert_id($connect) . "'</script>";
         
-        echo "<script>alert('Thank You. Now you can start testing Product')</script>";
     }else{
         echo "<script>alert('Failure')</script>";
 
@@ -24,6 +28,16 @@ $res = mysqli_query($connect,$sql);
 
 
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tester Form</title>
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+<div class="container">
 
 <h1 style="margin-bottom:40px; text-align:center; font-weight:bold;">Enter Tester Details</h1>
 <form action="" method="post">
@@ -42,10 +56,12 @@ $res = mysqli_query($connect,$sql);
             <input type="tel" class="form-control" name="phone-num" placeholder="E.g: +92 31242354">
         </div>
             <div class="card-body">
-                <input class="btn btn-primary"  type="submit" value="add-tester" name="add-tester">
+                <input class="btn btn-primary"  type="submit" value="Next" name="add-tester">
                 
             </div>
         </div>
     </div>
     </form>
-    
+    </div>
+</body>
+</html>
