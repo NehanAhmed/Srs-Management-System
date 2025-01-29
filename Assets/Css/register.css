@@ -328,3 +328,10 @@ input{
     width: 95%;
   }
 }
+
+#dep_id{
+  display: none;
+}
+#dep_id.active{
+  display: block;
+}

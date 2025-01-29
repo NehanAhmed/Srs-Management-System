@@ -110,8 +110,8 @@
         </div>
     </section>
 
-   
 
+    <?php include "./Partials/main-footer.php" ?>
 
 
     <!-- Bootstrap JS CDN -->

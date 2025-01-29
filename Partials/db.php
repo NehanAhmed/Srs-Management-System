@@ -9,8 +9,6 @@ $connect = mysqli_connect($host, $username, $password, $db);
 
 if (!$connect) {
     die("Error" . mysqli_connect_error());
-}else{
+} else {
     // echo "added";
 }
-
-?>

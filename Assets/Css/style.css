@@ -55,3 +55,16 @@ margin-bottom: 0.5rem;
 footer hr {
 border-color: rgba(255, 255, 255, 0.2);
 }
+
+.thead{
+    background-color: #343a40;
+    color: white;
+}
+
+td .test-btn{
+    width:80px;
+    height: 30px;
+    border-radius: 50%;
+    background-color:#343a40;
+    /* font-size: 22px; */
+}

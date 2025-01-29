@@ -27,15 +27,14 @@ $joinres = mysqli_query($connect,$joinSql);
                 <!-- Start Page Content -->
                 <!-- ============================================================== -->
                 <div class="row">
-                    <!-- column -->
-                    <div class="col-sm-12">
+                <h1 class="title text-center ">Products To be Retested</h1>
+                    <div class="col-sm-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <h1 class="card-title">Retesting Products</h1>
                                 
                                 <div class="table-responsive">
                                     <table class="table user-table no-wrap">
-                                        <thead>
+                                        <thead class="table-dark">
                                             <tr>
                                                 <th class="border-top-0">#</th>
                                                 <th class="border-top-0">Product Name</th>
@@ -46,7 +45,7 @@ $joinres = mysqli_query($connect,$joinSql);
 
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="table-light">
                                         
                                             <?php while ($row = mysqli_fetch_assoc($joinres)):?>
 
@@ -57,7 +56,7 @@ $joinres = mysqli_query($connect,$joinSql);
                                                 <td><?php echo $row['ManufacturingDate']?></td>
                                                 <td><?php echo $row['ProductType']?></td>
                                                 <td><?php echo $row['RevisionNumber']?></td>
-                                                <td><a href="index.php?tester-form&id=<?php echo $row['ProductID']?>" class="btn btn-primary">Retest</a></td>
+                                                <td><a href="index.php?tester-form&id=<?php echo $row['ProductID']?>"><button type="button" class="btn btn-outline-dark w-100">Retest</button></a></td>
 
                                             </tr>
                                             

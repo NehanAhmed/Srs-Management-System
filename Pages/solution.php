@@ -8,8 +8,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../Assets/Css/solution.css">
 </head>
+
 <body>
-    <?php include "../Partials/main-header.php"?>
+    <?php include "../Partials/main-header.php" ?>
     <!-- SOLUTION SECTION -->
     <section class="solution-section d-flex justify-content-center align-items-center text-center">
         <div class="container">
@@ -75,7 +76,7 @@
         </div>
         </div>
     </section>
-    <?php include "../Partials/main-footer.php"?>
+    <?php include "../Partials/main-footer.php" ?>
     <script src="https://kit.fontawesome.com/0a02fbb60a.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

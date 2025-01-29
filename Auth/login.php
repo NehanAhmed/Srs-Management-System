@@ -22,6 +22,7 @@ if (isset($_POST['login'])) {
             $_SESSION['profileImg'] = $row['profileImg'];
             $_SESSION['Email'] = $row['Email'];
             $_SESSION['RoleID'] = $row['RoleID'];
+            $_SESSION['dep_id'] = $row['dep_id'];
             echo "<script>
                 
                 window.location.href = '../Dashboard/index.php';

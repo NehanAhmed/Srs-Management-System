@@ -1,11 +1,31 @@
 <?php
 include __DIR__ . "/../../Partials/db.php";
 
+
+
 // Immediately handle form submission and header redirects first
 if (isset($_POST['add-tester'])) {
     if (isset($_GET['id']) && isset($_GET['tester_id'])) {
         $p_id = $_GET['id'];
         $tester_id = $_GET['tester_id'];
+        $testing_type_query = "SELECT 
+    products.ProductID AS ProductID, 
+    products.ProductName, 
+    products.TestingType AS TestingTypeID, 
+    testingtype.TestingType AS TestingType
+FROM 
+    products
+JOIN 
+    testingtype 
+ON 
+    products.TestingType = testingtype.id
+WHERE 
+    products.ProductID = $p_id; -- Replace 101 with the desired ProductID
+";
+$testing_type_result = mysqli_query($connect, $testing_type_query);
+$testing_type_row = mysqli_fetch_assoc($testing_type_result);
+
+
 
         function generateUniqueTesterId($connect) {
             do {
@@ -17,13 +37,23 @@ if (isset($_POST['add-tester'])) {
         }
 
         $t_id = generateUniqueTesterId($connect);
-        $t_type = $_POST['t-type'];
+        $t_type = $testing_type_row['TestingType'];
         $t_date = $_POST['date'];
         $t_status = $_POST['testingStatus'];
         $t_remark = $_POST['reviews'];
         
         if ($t_status == 'Pass') {
-            $updateProductStatus = "UPDATE `products` SET `Status`= 'Pass' WHERE ProductID = $p_id";
+            $workflowStatus = 'CPRI';
+            $workFlow = "UPDATE `workflow` SET `CurrentStage` = '$workflowStatus' WHERE `ProductID` = $p_id";
+            $workFlowQuery= mysqli_query($connect, $workFlow);
+
+            $cpriStatus = 'Pending';
+            $insertToCpri ="INSERT INTO `cpri`(`SubmissionDate`, `ApprovalStatus`, `Remarks`, `ProductID`) VALUES (?,?,?,?)";
+            $stmt = mysqli_prepare($connect, $insertToCpri);
+            mysqli_stmt_bind_param($stmt, "sssi", $t_date, $cpriStatus, $t_remark, $p_id);
+            $cpriRes = mysqli_stmt_execute($stmt);
+            $product_status = 'CPRI';
+            $updateProductStatus = "UPDATE `products` SET `Status`= '$product_status' WHERE ProductID = $p_id";
             $updateProductStatusQuery= mysqli_query($connect, $updateProductStatus);
 
 
@@ -44,12 +74,14 @@ if (isset($_POST['add-tester'])) {
                 echo "<script>alert('Failed to prepare statement: " . mysqli_error($connect) . "')</script>";
             }
         } else {
-            $updateRevisionNum = "UPDATE `products` SET `RevisionNumber`= '2' WHERE ProductID = $p_id";
+            $workflowStatus = 'Re-manufacturing';
+
+            $workFlow = "UPDATE `workflow` SET `CurrentStage` = '$workflowStatus' WHERE `ProductID` = $p_id";
+            $workFlowQuery= mysqli_query($connect, $workFlow);
+            $updateRevisionNum = "UPDATE `products` SET `RevisionNumber`= '2' AND set `Status`= 'Fail' WHERE ProductID = $p_id";
 
             $updateQueryRes = mysqli_query($connect, $updateRevisionNum);
-            $updateStatus = "UPDATE `products` SET `Status`= 'Fail' WHERE ProductID = $p_id";
-
-            $updatestatusRes = mysqli_query($connect, $updateStatus);
+           
 
             $sql = "INSERT INTO `remanufacturing`(`ProductID`, `RemanufacturingDate`, `RevisionNumber`, `Remarks`) VALUES (?,?,?,?)";
             $stmt = mysqli_prepare($connect, $sql);
@@ -81,7 +113,7 @@ if (isset($_POST['add-tester'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tester Form</title>
-    <link rel="stylesheet" href="../css/app.css">
+    <!-- <link rel="stylesheet" href="../css/app.css"> -->
 </head>
 
 <body>
@@ -91,10 +123,6 @@ if (isset($_POST['add-tester'])) {
         <form action="" method="post">
             <div class="col-12 col-lg-12">
                 <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-2">Testing Type</h5>
-                        <input type="text" class="form-control" name="t-type" placeholder="E.g: Reviewing" required>
-                    </div>
                     <div class="card-body">
                         <h5 class="card-title mb-2">Testing Date</h5>
                         <input type="date" class="form-control" name="date" required>

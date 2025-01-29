@@ -22,16 +22,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  $file_name=$_FILES['image']['name'];
  $file_size=$_FILES['image']['size'];
  $file_tmp=$_FILES['image']['tmp_name'];
- $file_type=$_FILES['image']['type'];
+ // Validate and sanitize dep_id input
+
  
- 
-  $target_file=$upload_dir.basename($file_name);
- 
- //yeah function upload krney k liye used hota hai
- 
- $UploadStatus= move_uploaded_file($file_tmp,$upload_dir.$file_name);
- 
- 
+ $target_file = $file_name;
+ $UploadStatus = move_uploaded_file($file_tmp, $upload_dir . '/' . $file_name);
+ if (!$UploadStatus) {
+     $target_file = null;
+ }
  
  }
  
@@ -39,7 +37,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = htmlspecialchars($_POST['email']);
     $pass = htmlspecialchars($_POST['pass']);
     $roleId = htmlspecialchars($_POST['role']);
-
+    
+    $dep_id = filter_input(INPUT_POST, 'dep_id', FILTER_VALIDATE_INT);
+    if ($dep_id === false || $dep_id === null) {
+        $dep_id = 0; // Set default value if invalid or not provided
+    }
+   
+    // Ensure dep_id is not negative
+    $dep_id = max(0, $dep_id);
     // Validate role ID
     $roleCheckSql = "SELECT RoleID FROM userroles WHERE RoleID = ?";
     $stmt = mysqli_prepare($connect, $roleCheckSql);
@@ -53,10 +58,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     mysqli_stmt_close($stmt);
 
+    $depIdCheckSql = "SELECT DepartmentID FROM testdepartments WHERE DepartmentID = ?";
+    $stmt = mysqli_prepare($connect, $depIdCheckSql);
+    mysqli_stmt_bind_param($stmt, "i", $dep_id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+
+    
+    mysqli_stmt_close($stmt);
+
+
     $hash = password_hash($pass, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO `users`(`UserName`, `Email`, `PasswordHash`, `RoleID`,`profileImg`) VALUES (?, ?, ?, ?,?)";
+    $sql = "INSERT INTO `users`(`UserName`, `Email`, `PasswordHash`, `RoleID`,`profileImg`,`dep_id`) VALUES (?, ?, ?, ?,?,?)";
     $stmt = mysqli_prepare($connect, $sql);
-    mysqli_stmt_bind_param($stmt, "sssis", $name, $email, $hash, $roleId,$target_file);
+    mysqli_stmt_bind_param($stmt, "sssiss", $name, $email, $hash, $roleId,$target_file,$dep_id);
     $res = mysqli_stmt_execute($stmt);
 
     if ($res) {

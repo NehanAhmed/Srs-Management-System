@@ -29,19 +29,19 @@ if (!$joinres) {
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <h1 class="card-title fs-5">Testers</h1>
+                    
                     <div class="table-responsive">
                         <table class="table user-table no-wrap">
-                            <thead>
-                                <tr>
+                            <thead class="table-dark">
+                                <tr class="text-center">
                                     <th class="border-top-0">Tester Name</th>
                                     <th class="border-top-0">Tester Email</th>
                                     <th class="border-top-0">Current Project</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="table-light">
                                 <?php while ($row = mysqli_fetch_assoc($joinres)): ?>
-                                    <tr>
+                                    <tr class="text-center">
                                         <td><?php echo $row['tester_name']; ?></td>
                                         <td><?php echo $row['tester_email']; ?></td>
                                         <td><?php echo $row['Products'] ?></td>

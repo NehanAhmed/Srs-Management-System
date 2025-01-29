@@ -37,7 +37,7 @@ $res = mysqli_query($connect, $sql);
                 <div class="looking-for">
                     <div class="form-input">
                         <div class="title">Select Your Role</div>
-                        <select name="role" id="role">
+                        <select name="role" id="role" oninput="showDepIdInput()">
                             <option value="">Select Role</option>
                             <?php if (mysqli_num_rows($res)>0):?>
                                 <?php while ($row=mysqli_fetch_assoc($res)):?>
@@ -58,6 +58,10 @@ $res = mysqli_query($connect, $sql);
                     <div class="form-input">
                         <div class="title">Password</div>
                         <input type="password" name="pass" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-input" id="dep_id">
+                        <div class="title">Enter Your Department ID</div>
+                        <input type="number" name="dep_id" placeholder="E.g: 1">
                     </div>
                     <div class="form-input">
                         <div class="title">Upload Your Image</div>
@@ -85,7 +89,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
         }
 
         var allowedTypes = ['image/png', 'image/webp', 'image/jpeg'];
-        if (!allowedTypes.includes(file.type)) {
+        if (!allowedTypes.includes(file.type)) {    
             alert('Only PNG, WEBP, and JPG files are allowed.');
             return;
         }
@@ -95,6 +99,19 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
     this.submit();
 });
 </script>
-
+<script>
+    let role = document.getElementById('role').addEventListener('change', function(){
+    let dep_id_inp = document.getElementById('dep_id');
+    if (this.value === '2') {
+        dep_id_inp.classList.add('active');
+      } else {
+        dep_id_inp.classList.remove('active');
+        dep_id_inp.value = '0';
+      }
+    })
+    
+    
+    
+</script>
 </body>
 </html>

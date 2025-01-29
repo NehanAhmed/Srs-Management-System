@@ -3,11 +3,12 @@
 include "../../Partials/db.php";
 session_start(); // Start session for CSRF protection
 
-// Generate CSRF token if not already created
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
 
+$t_type_sql = "SELECT * FROM `testingtype`";
+$t_type_res = mysqli_query($connect,$t_type_sql);
+if (!$t_type_res) {
+    echo "Error fetching testing type data";
+}
 // Function to generate a unique Product ID
 function generateProductId($connect) {
     do {
@@ -17,30 +18,36 @@ function generateProductId($connect) {
     } while (mysqli_num_rows($result) > 0);
     return $product_id;
 }
-
+function getCurrentTime() {
+    return $date= date('Y-m-d H:i:s');
+}
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-product'])) {
-    // CSRF Token validation
-    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("Invalid CSRF token");
-    }
+  
 
     // Validate required fields
-    if (!empty($_POST['p-name']) && !empty($_POST['p-type']) && !empty($_POST['m-date']) && !empty($_POST['r-num'])) {
+    if (!empty($_POST['p-name']) && !empty($_POST['p-type']) && !empty($_POST['m-date']) && !empty($_POST['t_type'] && $_POST['dep_id'])) {
         // Sanitize inputs
         $p_name = htmlspecialchars($_POST['p-name']);
         $p_type = htmlspecialchars($_POST['p-type']);
         $m_date = htmlspecialchars($_POST['m-date']);
-        $r_num = htmlspecialchars($_POST['r-num']);
+        $t_type = htmlspecialchars($_POST['t_type']);
+        $dep_id = htmlspecialchars($_POST['dep_id']);
         $product_id = generateProductId($connect);
-
+        $revision_num = 1;
         // Use prepared statements to insert data securely
-        $sql = "INSERT INTO `products`(`ProductID`, `ProductName`, `ProductType`, `ManufacturingDate`, `RevisionNumber`,`Status`) 
-                VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `products`(`ProductID`, `ProductName`, `ProductType`, `ManufacturingDate`, `RevisionNumber`,`Status`,`TestingType`,`DepartmentID`) 
+                VALUES (?, ?, ?, ?, ?, ?,?,?)";
         $stmt = $connect->prepare($sql);
-        $stmt->bind_param("isssss", $product_id, $p_name, $p_type, $m_date, $r_num, $status);
+        $stmt->bind_param("isssssss", $product_id, $p_name, $p_type, $m_date, $revision_num, $status,$t_type,$dep_id);
         $status = '';
         $res = $stmt->execute();
-
+        $workflowStatus = 'In Progress'; // Set product status to active by default
+        $WorkflowStage = 'Testing'; // Set product status to active by default\
+        $date = getCurrentTime(); // Get current date and time
+        $workflow = "INSERT INTO `workflow`(`ProductID`, `CurrentStage`, `StartDate`, `EndDate`, `Status`) VALUES (?,?,?,?,?)";
+        $stmt = $connect->prepare($workflow);
+        $stmt->bind_param("sssss", $product_id, $WorkflowStage, $date, $date, $workflowStatus);
+        $workflowRes = $stmt->execute();
         if ($res) {
             echo "<script>alert('Product Added Successfully'); window.location.href = '../index.php';</script>";
         } else {
@@ -64,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-product'])) {
     <div class="container">
         <h1 style="margin-bottom:40px; text-align:center; font-weight:bold;">Add New Product to Test</h1>
         <form action="" method="post">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            
             <div class="col-12 col-lg-12">
                 <div class="card">
                     <div class="card-body">
@@ -80,8 +87,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add-product'])) {
                         <input type="date" class="form-control" name="m-date" required>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title mb-2">Revision Number</h5>
-                        <input type="text" class="form-control" name="r-num" placeholder="E.g: 1" required>
+                        <h5 class="card-title mb-2">Testing Type</h5>
+                        <select name="t_type">
+                        <option value="">Select Testing Type</option>
+                        <?php while ($row = mysqli_fetch_assoc($t_type_res)):?>
+                            <option value="<?= $row['id'] ?>"><?= $row['TestingType'] ?></option>
+                        <?php endwhile?>
+                        </select>
+
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">Department ID</h5>
+                        <input type="number" required name="dep_id">
                     </div>
                     <div class="card-body">
                         <button class="btn btn-primary" name="add-product">Add</button>

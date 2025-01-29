@@ -23,13 +23,13 @@ if ($res) {
                         <div class="card">
                             <div class="card-body">
                                 <div class="header d-flex w-100 justify-content-between">
-                                <div><h1 class="card-title">All Products</h1></div>
-                                <div><a href="./include/add-product.php"><button class="btn btn-primary">Add Product</button></a></div>
+                                <div><h1 class="card-title fs-5 align-self-center">All Products</h1></div>
+                                <div><a href="./include/add-product.php"><button class="btn btn-outline-primary">Add Product</button></a></div>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="table-responsive mt-3">
                                     <table class="table user-table no-wrap">
-                                        <thead>
-                                            <tr>
+                                        <thead class="table-dark">
+                                            <tr class="text-center">
                                                 <th class="border-top-0">Product Name</th>
                                                 <th class="border-top-0">Product Type</th>
                                                 <th class="border-top-0">Manufacturing Date</th>
@@ -39,12 +39,12 @@ if ($res) {
 
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="table-light">
                                         
                                             <?php while ($row = mysqli_fetch_assoc($res)):?>
                                                 
                                                     
-                                            <tr>
+                                            <tr class="text-center">
                                                 <td><?php echo $row['ProductName']?></td>
                                                 <td><?php echo $row['ProductType']?></td>
                                                 <td><?php echo $row['ManufacturingDate']?></td>
