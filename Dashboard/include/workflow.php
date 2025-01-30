@@ -75,17 +75,4 @@ $res = mysqli_query($connect,$sql);
 								</table>
 							</div>
 						</div>
-						<div class="col-12 col-lg-4 col-xxl-3 d-flex">
-							<div class="card flex-fill w-100">
-								<div class="card-header">
-
-									<h5 class="card-title mb-0">Monthly Sales</h5>
-								</div>
-								<div class="card-body d-flex w-100">
-									<div class="align-self-center chart chart-lg"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
-										<canvas id="chartjs-dashboard-bar" width="237" height="437" style="display: block; height: 350px; width: 190px;" class="chartjs-render-monitor"></canvas>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+						

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 25, 2025 at 10:11 AM
+-- Generation Time: Jan 30, 2025 at 12:03 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,16 @@ CREATE TABLE `cpri` (
   `ProductID` char(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `cpri`
+--
+
+INSERT INTO `cpri` (`CPRI_SubmissionID`, `SubmissionDate`, `ApprovalStatus`, `Remarks`, `ProductID`) VALUES
+(3, '2025-01-26', 'Approved', 'obgufwuiefg', '4751343044'),
+(4, '2025-01-27', 'Pending', 'Good', '3582939483'),
+(5, '2025-01-27', 'Pending', 'Good', '7020876114'),
+(6, '2025-01-27', 'Approved', 'Good', '6110633644');
+
 -- --------------------------------------------------------
 
 --
@@ -47,8 +57,20 @@ CREATE TABLE `products` (
   `ProductType` varchar(50) NOT NULL,
   `ManufacturingDate` date NOT NULL,
   `RevisionNumber` int(11) DEFAULT 0,
-  `Status` enum('Pass','Fail') NOT NULL
+  `Status` enum('Pass','Fail') NOT NULL,
+  `TestingType` int(100) NOT NULL,
+  `DepartmentID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`ProductID`, `ProductName`, `ProductType`, `ManufacturingDate`, `RevisionNumber`, `Status`, `TestingType`, `DepartmentID`) VALUES
+('3582939483', 'Cable Trays', 'Circuit', '2025-01-27', 1, '', 1, 1),
+('4751343044', 'Electric Switch', 'Switch', '2025-01-26', 1, 'Pass', 1, 1),
+('6110633644', 'Board', 'Board', '2025-01-27', 1, '', 1, 1),
+('7020876114', 'Cable Trays', 'Circuit', '2025-01-27', 1, '', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -76,6 +98,19 @@ CREATE TABLE `testdepartments` (
   `DepartmentLocation` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `testdepartments`
+--
+
+INSERT INTO `testdepartments` (`DepartmentID`, `DepartmentName`, `DepartmentLocation`) VALUES
+(1, 'Functional Department', 'Karachi'),
+(2, 'Stress Testing', 'Lahore'),
+(3, 'Safety Testing', 'Punjab'),
+(4, 'Performance Testing', 'Kpk'),
+(5, 'Durability Testing', 'Sindh'),
+(6, 'Environmental Testing', 'DHA'),
+(7, 'Compliance Testing', 'Chaman');
+
 -- --------------------------------------------------------
 
 --
@@ -89,6 +124,16 @@ CREATE TABLE `testers` (
   `tester_email` varchar(200) NOT NULL,
   `start_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testers`
+--
+
+INSERT INTO `testers` (`tester_id`, `product_id`, `tester_name`, `tester_email`, `start_date`) VALUES
+(16, 2147483647, 'Basit', 'basit@gmail.com', '2025-01-26 17:53:35'),
+(17, 2147483647, 'Basit', 'basit@gmail.com', '2025-01-27 10:50:54'),
+(18, 2147483647, 'Basit', 'basit@gmail.com', '2025-01-27 10:51:20'),
+(19, 2147483647, 'Basit', 'basit@gmail.com', '2025-01-27 11:03:01');
 
 -- --------------------------------------------------------
 
@@ -105,6 +150,42 @@ CREATE TABLE `testing` (
   `TestingStatus` enum('Pass','Fail') NOT NULL,
   `Remarks` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testing`
+--
+
+INSERT INTO `testing` (`TestingID`, `ProductID`, `TestingType`, `TestingDate`, `TesterID`, `TestingStatus`, `Remarks`) VALUES
+('637214230067', '4751343044', 'Functional Testing', '2025-01-26', 16, 'Pass', 'obgufwuiefg'),
+('705279727517', '3582939483', 'Functional Testing', '2025-01-27', 17, 'Pass', 'Good'),
+('912644448771', '6110633644', 'Functional Testing', '2025-01-27', 19, 'Pass', 'Good'),
+('933932336934', '7020876114', 'Functional Testing', '2025-01-27', 18, 'Pass', 'Good');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `testingtype`
+--
+
+CREATE TABLE `testingtype` (
+  `id` int(11) NOT NULL,
+  `TestingType` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `testingtype`
+--
+
+INSERT INTO `testingtype` (`id`, `TestingType`) VALUES
+(1, 'Functional Testing'),
+(2, 'Stress Testing'),
+(3, 'Safety Testing'),
+(4, 'Performance Testing'),
+(5, 'Durability Testing'),
+(6, 'Environmental Testing'),
+(7, 'Compliance Testing'),
+(8, 'abc '),
+(9, 'abc ');
 
 -- --------------------------------------------------------
 
@@ -138,17 +219,19 @@ CREATE TABLE `users` (
   `Email` varchar(100) NOT NULL,
   `PasswordHash` varchar(255) NOT NULL,
   `RoleID` int(11) NOT NULL,
-  `profileImg` varchar(1000) NOT NULL
+  `profileImg` varchar(1000) NOT NULL,
+  `dep_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`UserID`, `UserName`, `Email`, `PasswordHash`, `RoleID`, `profileImg`) VALUES
-(1, 'Nehan', 'nehanahmed2k23@gmail.com', '$2y$10$cW2VMog9ZtxaJJGQpgilseXRbeDIvCF1EOqCa8fz6MOCrKLxO6qPW', 1, '../Assets/Images/profileImgDocument from عبدالودود.jpg'),
-(2, 'Sufyan', 'sufyanahmed2004zaq@gmail.com', '$2y$10$DrqmkWmDfB8jjWT7Zlj6leELQdkD6YZ4Wew4LZW5Bd1wZuwzWqaBG', 2, '../Assets/Images/profileImg389ba340-4693-468f-ad28-3b6bafc4647c.jpg'),
-(3, 'Arham', 'arham@gmail.com', '$2y$10$eVRR/4DwHhiP3LhtPNtDnuRUntRM2t1bdTTW27hyYvGwR.rQvjb/a', 3, '../Assets/Images/profileImgEmmirati (1).png');
+INSERT INTO `users` (`UserID`, `UserName`, `Email`, `PasswordHash`, `RoleID`, `profileImg`, `dep_id`) VALUES
+(8, 'Admin', 'admin@gmail.com', '$2y$10$Oo9kPyvNuDZndcGkvTlAz.o62PDuq9ICkj0DhEhJhJCQEN2HkNQIm', 1, 'otnAey.png', 0),
+(9, 'Tester', 'tester@gmail.com', '$2y$10$J7pe.TZ.vdJzr/zvZOI94.veT7.hD85kAgqF6j7YxP6niU3NW7uta', 2, 'otnAey.png', 1),
+(10, 'Basit', 'basit@gmail.com', '$2y$10$hOhoFnmTR.Jz2nVwTDb1OuZ2Kr37jl49Av7MQ6AYZ74JPdeFymgiq', 2, 'otnAey.png', 1),
+(11, 'Manager', 'manager@gmail.com', '$2y$10$vTN6jWfN6PqpYmP.IZOePuDn7pKX0xmPcREAhw2clVgAq1g2cRgUe', 3, 'ss.png', 0);
 
 -- --------------------------------------------------------
 
@@ -162,8 +245,16 @@ CREATE TABLE `workflow` (
   `CurrentStage` enum('Testing','Re-manufacturing','CPRI') NOT NULL,
   `StartDate` date NOT NULL,
   `EndDate` date DEFAULT NULL,
-  `Status` enum('In Progress','Completed') NOT NULL
+  `Status` enum('In Progress','Completed','Rejected') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `workflow`
+--
+
+INSERT INTO `workflow` (`WorkflowID`, `ProductID`, `CurrentStage`, `StartDate`, `EndDate`, `Status`) VALUES
+(1, '7020876114', '', '2025-01-27', '2025-01-27', 'In Progress'),
+(2, '6110633644', 'CPRI', '2025-01-27', '2025-01-27', 'Completed');
 
 --
 -- Indexes for dumped tables
@@ -180,7 +271,9 @@ ALTER TABLE `cpri`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`ProductID`);
+  ADD PRIMARY KEY (`ProductID`),
+  ADD KEY `FK_t_type` (`DepartmentID`),
+  ADD KEY `FK_testing_type` (`TestingType`);
 
 --
 -- Indexes for table `remanufacturing`
@@ -208,6 +301,12 @@ ALTER TABLE `testing`
   ADD PRIMARY KEY (`TestingID`),
   ADD KEY `testing_ibfk_1` (`ProductID`),
   ADD KEY `testing_ibfk_2` (`TesterID`);
+
+--
+-- Indexes for table `testingtype`
+--
+ALTER TABLE `testingtype`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `userroles`
@@ -238,7 +337,7 @@ ALTER TABLE `workflow`
 -- AUTO_INCREMENT for table `cpri`
 --
 ALTER TABLE `cpri`
-  MODIFY `CPRI_SubmissionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CPRI_SubmissionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `remanufacturing`
@@ -250,13 +349,19 @@ ALTER TABLE `remanufacturing`
 -- AUTO_INCREMENT for table `testdepartments`
 --
 ALTER TABLE `testdepartments`
-  MODIFY `DepartmentID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `DepartmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `testers`
 --
 ALTER TABLE `testers`
-  MODIFY `tester_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `tester_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `testingtype`
+--
+ALTER TABLE `testingtype`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `userroles`
@@ -268,13 +373,13 @@ ALTER TABLE `userroles`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `workflow`
 --
 ALTER TABLE `workflow`
-  MODIFY `WorkflowID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `WorkflowID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -285,6 +390,13 @@ ALTER TABLE `workflow`
 --
 ALTER TABLE `cpri`
   ADD CONSTRAINT `cpri_ibfk_1` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`);
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `FK_t_type` FOREIGN KEY (`DepartmentID`) REFERENCES `testingtype` (`id`),
+  ADD CONSTRAINT `FK_testing_type` FOREIGN KEY (`TestingType`) REFERENCES `testingtype` (`id`);
 
 --
 -- Constraints for table `remanufacturing`

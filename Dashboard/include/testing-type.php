@@ -27,7 +27,7 @@ if ($res) {
                                 <div><a href="index.php?add-testing-type"><button class="btn btn-outline-primary">Add Product</button></a></div>
                                 </div>
 
-                    <div class="table-responsive">
+                    <div class="table-responsive mt-2">
                         <table class="table user-table no-wrap">
                             <thead class="table-dark p-5">
                                 <tr class="p-5">
